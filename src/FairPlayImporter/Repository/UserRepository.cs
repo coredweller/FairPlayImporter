@@ -2,7 +2,6 @@
 using FairPlayImporter.Model;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
-using System.Xml.Linq;
 
 namespace FairPlayImporter.Repository
 {
@@ -11,13 +10,13 @@ namespace FairPlayImporter.Repository
         private string _connectionString;
         public UserRepository(IConfiguration configuration)  
         {  
-            _connectionString = configuration?.GetConnectionString("Default") ?? throw new ArgumentException("NO CONFIGURATION FOR CONNECTION STRINGS!!");  
+            _connectionString = configuration?.GetConnectionString("FairPlayDatabaseContext") ?? throw new ArgumentException("NO CONFIGURATION FOR CONNECTION STRINGS!!");  
         }
 
         public async Task<List<User>> GetUsersByName(string name)
         {
             var users = new List<User>();
-            var sql = $"SELECT * FROM User WHERE Name = {name}";
+            var sql = $"SELECT * FROM [User] WHERE Name = '{name}';";
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -31,13 +30,13 @@ namespace FairPlayImporter.Repository
         public async Task<User> CreateUser(string name)
         {
             var sql = @"
-                INSERT INTO User (Name)
+                INSERT INTO [User] (Name, CreatedDate)
                 OUTPUT INSERTED.Id
-                VALUES (@Name);";
+                VALUES (@Name, @CreatedDate);";
             var user = new User(name);
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                user.Id = await connection.QuerySingleAsync<long>(sql, new { Name = name });
+                user.Id = await connection.QuerySingleAsync<long>(sql, new { Name = name, CreatedDate = DateTime.UtcNow });
             }
 
             return user;
@@ -46,7 +45,7 @@ namespace FairPlayImporter.Repository
         public async Task<User> UpdateUser(User user)
         {
             var sql = @"
-                UPDATE User
+                UPDATE [User]
                 SET UpdatedDate = @UpdatedDate
                 WHERE Id = @UserId;";
 

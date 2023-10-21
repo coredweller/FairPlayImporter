@@ -1,17 +1,27 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using FairPlayImporter.Processors;
 using FairPlayImporter.Repository;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 internal class Program
 {
     public static async Task Main(string[] args)
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", false)
+        .Build();
+
         var serviceProvider = new ServiceCollection()
             .AddLogging()
             .AddScoped<IUserRepo, UserRepository>()
+            .AddScoped<ICardRepo, CardRepository>()
+            .AddScoped<IScheduleRepo, ScheduleRepository>()
             .AddScoped<IImportDecks, DeckImporter>()
+            .AddScoped<IPersistPlayerHands, PlayerHandPersister>()
             .AddScoped<ICalculateSchedules, ScheduleCalculator>()
+            .AddSingleton(configuration)
             .BuildServiceProvider();
 
         Console.WriteLine("Player's Name:");
@@ -47,15 +57,15 @@ internal class Program
         var importer = serviceProvider.GetService<IImportDecks>();
         if(importer == null) { Console.WriteLine("Importer Missing!"); return; }
 
-        var results = await importer.Import(playerName, location);
+        var playerHand = await importer.Import(playerName, location);
 
+        var persister = serviceProvider.GetService<IPersistPlayerHands>();
+        if(persister == null) { Console.WriteLine("Persister Missing!"); return; }
 
-        //REPORT RESULTS TO USER
-        //how many cards imported
-        //how many tasks imported
+        var results = persister.SavePlayerHand(playerHand);
 
-
-
+        Console.WriteLine($"Number of tasks imported: {playerHand.Cards.Count} and Number of tasks saved: {results.Cards.Count}");
+        
         //THEN write another application that goes through all of the TaskSchedule's
         // lay out the next week of things by day
         // https://stackoverflow.com/questions/8121374/calculate-cron-next-run-time-in-c-sharp

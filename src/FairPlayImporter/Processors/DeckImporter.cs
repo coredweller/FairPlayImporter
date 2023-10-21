@@ -5,7 +5,7 @@ namespace FairPlayImporter.Processors
 {
     public interface IImportDecks
     {
-        Task<ImportResults> Import(string userName, string fileLocation);
+        Task<PlayerHand> Import(string userName, string fileLocation);
     }
 
     public class DeckImporter : IImportDecks
@@ -19,29 +19,29 @@ namespace FairPlayImporter.Processors
             _scheduler = scheduler;
         }
 
-        public async Task<ImportResults> Import(string userName, string fileLocation)
+        public async Task<PlayerHand> Import(string userName, string fileLocation)
         {
-            var result = new ImportResults();
-
             var currentUser = await GetUser(userName);
-
-            var tasks = await ParseCsv(fileLocation, currentUser.Id);
-
-
-
-            return result;
+            var hand = ParseCsv(fileLocation, currentUser.Id);
+            return hand;
         }
 
-        private async Task<List<PlayerTask>> ParseCsv(string fileLocation, long userId)
+        private PlayerHand ParseCsv(string fileLocation, long userId)
         {
-            List<PlayerTask> playerTasks = new List<PlayerTask>();
+            var firstLine = true;
+            List<CardInHand> cardsInHand = new List<CardInHand>();
             using (var reader = new StreamReader(fileLocation))
             {
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
-                    var values = line.Split(';');
+                    if(firstLine)
+                    {
+                        line = reader.ReadLine();
+                        firstLine = false;
+                    }
 
+                    var values = line.Split(';');
                     var userCard = new UserCard { CardName = values[0], Suit = values[1], UserId = userId };
 
                     Cadence cadence;
@@ -51,23 +51,18 @@ namespace FairPlayImporter.Processors
                     }
 
                     var playerTask = new PlayerTask { TaskType = values[2], Requirement = values[3], CadenceId = (short)cadence, MinimumStandard = values[6], Notes = values[7] };
-
+                    TaskSchedule? schedule = null;
                     var when = values[5];
-                    playerTasks.Add(playerTask);
-                    if (when != null)
+                    if (!string.IsNullOrWhiteSpace(when))
                     {
-                        var schedule = _scheduler.GenerateSchedule(playerTask.Id, when, cadence, when);
-                        // TODO: When? is used to create TaskSchedule
-                        // Save schedule
+                        schedule = _scheduler.GenerateSchedule(userCard.CardName, playerTask.Id, when, cadence, when);
                     }
-                    
-                    //TODO: LEFT OFF HERE
-                        // Save all things to DB
 
+                    cardsInHand.Add(new CardInHand(userCard, playerTask, schedule));
                 }
             }
 
-            return playerTasks;
+            return new PlayerHand(cardsInHand);
         }
 
         private async Task<User> GetUser(string userName)
