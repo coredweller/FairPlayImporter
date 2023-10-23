@@ -39,7 +39,7 @@ namespace FairPlayImporter.Processors
                 {
                     throw new ArgumentException($"Invalid saving of card: {card.UserCard.CardName} with error: {ex}");
                 }
-            }).Select(t => t.Result).ToList(); //run it synchronously so UserCards are not duplicated
+            }).Select(t => t.Result).ToList(); //run it synchronously so UserCards are not duplicated https://stackoverflow.com/questions/35011656/async-await-in-linq-select
             return new PlayerHand(cardsInHand);
         }
     }

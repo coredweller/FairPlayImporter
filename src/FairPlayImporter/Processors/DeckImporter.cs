@@ -29,7 +29,7 @@ namespace FairPlayImporter.Processors
         private PlayerHand ParseCsv(string fileLocation, long userId)
         {
             var firstLine = true;
-            List<CardInHand> cardsInHand = new List<CardInHand>();
+            IList<CardInHand> cardsInHand = new List<CardInHand>();
             using (var reader = new StreamReader(fileLocation))
             {
                 while (!reader.EndOfStream)

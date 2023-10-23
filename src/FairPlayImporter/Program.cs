@@ -35,12 +35,15 @@ internal class Program
         switch(playerName, location)
         {
             case ("", ""):
+            case (null, null):
                 message = "Please input Name and Location!";
                 break;
             case ("", _):
+            case (null, _):
                 message = "Please input Name!";
                 break;
             case (_, ""):
+            case (_, null):
                 message = "Please input Location!";
                 break;
             case (_, _):
@@ -65,9 +68,5 @@ internal class Program
         var results = persister.SavePlayerHand(playerHand);
 
         Console.WriteLine($"Number of tasks imported: {playerHand.Cards.Count} and Number of tasks saved: {results.Cards.Count}");
-        
-        //THEN write another application that goes through all of the TaskSchedule's
-        // lay out the next week of things by day
-        // https://stackoverflow.com/questions/8121374/calculate-cron-next-run-time-in-c-sharp
     }
 }

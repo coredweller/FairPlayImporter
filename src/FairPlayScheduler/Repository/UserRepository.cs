@@ -26,35 +26,5 @@ namespace FairPlayImporter.Repository
 
             return users;
         }
-
-        public async Task<User> CreateUser(string name)
-        {
-            var sql = @"
-                INSERT INTO [User] (Name, CreatedDate)
-                OUTPUT INSERTED.Id
-                VALUES (@Name, @CreatedDate);";
-            var user = new User(name);
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                user.Id = await connection.QuerySingleAsync<long>(sql, new { Name = name, CreatedDate = DateTime.UtcNow });
-            }
-
-            return user;
-        }
-
-        public async Task<User> UpdateUser(User user)
-        {
-            var sql = @"
-                UPDATE [User]
-                SET UpdatedDate = @UpdatedDate
-                WHERE Id = @UserId;";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                await connection.ExecuteAsync(sql, new { UpdatedDate = user.UpdatedDate, UserId = user.Id });
-            }
-
-            return user;
-        }
     }
 }

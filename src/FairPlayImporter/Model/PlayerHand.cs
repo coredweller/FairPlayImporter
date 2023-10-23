@@ -2,11 +2,11 @@
 {
     public class PlayerHand
     {
-        public PlayerHand(List<CardInHand> cards)
+        public PlayerHand(IList<CardInHand> cards)
         {
             Cards = cards;
         }
 
-        public List<CardInHand> Cards { get; set; }
+        public IList<CardInHand> Cards { get; set; }
     }
 }

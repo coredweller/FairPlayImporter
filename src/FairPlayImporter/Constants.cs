@@ -6,7 +6,7 @@
         {
             public static class YearlyScheduleOptions 
             {
-                public static List<string> AllYearlyScheduleOptions = new List<string> { Jan1st, Feb1st, Mar1st, Apr1st, May1st, Jun1st, Jul1st, Aug1st, Sep1st, Oct1st, Nov1st, Dec1st };
+                public static IList<string> AllYearlyScheduleOptions = new List<string> { Jan1st, Feb1st, Mar1st, Apr1st, May1st, Jun1st, Jul1st, Aug1st, Sep1st, Oct1st, Nov1st, Dec1st };
 
                 public const string Jan1st = "January 1st";
                 public const string Feb1st = "February 1st";
@@ -24,7 +24,7 @@
 
             public static class MonthlyScheduleOptions
             {
-                public static List<string> AllMonthlyScheduleOptions = new List<string> { FirstOfMonth, FifthOfMonth, TenthOfMonth, FifteenthOfMonth, TwentiethOfMonth, TwentyFifthOfMonth, LastDayOfMonth };
+                public static IList<string> AllMonthlyScheduleOptions = new List<string> { FirstOfMonth, FifthOfMonth, TenthOfMonth, FifteenthOfMonth, TwentiethOfMonth, TwentyFifthOfMonth, LastDayOfMonth };
 
                 public const string FirstOfMonth = "1st of month";
                 public const string FifthOfMonth = "5th of month";
@@ -37,7 +37,7 @@
 
             public static class WeeklyScheduleOptions
             {
-                public static List<string> AllWeeklyScheduleOptions = new List<string> { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday};
+                public static IList<string> AllWeeklyScheduleOptions = new List<string> { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday};
 
                 public const string Sunday = "Sunday";
                 public const string Monday = "Monday";
