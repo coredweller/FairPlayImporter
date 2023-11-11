@@ -1,15 +1,15 @@
-﻿namespace FairPlayScheduler.Api.Model
+﻿namespace FairPlayScheduler.Api.Model.Api
 {
-    public class Responsibility
+    public class ResponsibilityModel
     {
         public long PlayerTaskId { get; set; }
         public string? CardName { get; set; }
         public string? Suit { get; set; }
         public string? TaskType { get; set; }
         public string? Requirement { get; set; }
-        public Cadence Cadence { get; set; }
+        public string? Cadence { get; set; }
         public string? MinimumStandard { get; set; }
-        public string? CronSchedule { get; set; }
+        public string? Schedule { get; set; }
         public string? When { get; set; }
         public string? Notes { get; set; }
     }

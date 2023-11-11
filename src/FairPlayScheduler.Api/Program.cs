@@ -13,6 +13,7 @@ namespace FairPlayScheduler.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddAutoMapper(typeof(Program));
 
             // Add services to the container.
 
@@ -36,6 +37,7 @@ namespace FairPlayScheduler.Api
             builder.Services
                 .AddScoped<IUserRepo, UserRepository>()
                 .AddScoped<IPlayerHandRepo, PlayerHandRepository>()
+                .AddScoped<ICompletedTaskRepository, CompletedTaskRepository>()
                 .AddScoped<IProjectResponsibility, ResponsibilityProjector>()
                 .AddSingleton(configuration)
                 .AddSingleton<IDatabaseConfig>(dbConfig);

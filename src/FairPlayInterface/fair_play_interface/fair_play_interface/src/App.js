@@ -6,7 +6,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      responsibilities: []
+      responsibilities: [],
+      completedResponsibilities: []
     }
   }
 
@@ -26,6 +27,21 @@ class App extends Component {
     }
   }
 
+  completeResponsibility = (ev) =>{
+    ev.preventDefault()
+    console.log("YESS");
+    //TODO: LEFT OFF HERE TRYING TO COMPLETE A RESPONSIBILITY ON BUTTON CLICK
+      //Call API
+      //If success then change background color or put it in a complete bucket at the bottom
+      //Then when the page loads check to see if it has already been completed 
+
+    const url = "https://localhost:7207/Responsibility";
+    // fetch(url)
+    // .then(response => response.json())
+    // .then(json => this.setState({ completedResponsibilities: json }))
+    // .then(res=> this.setState({quotes:[...this.state,res.data[0]]}))
+  }
+
   render() {
     const { responsibilities } = this.state;
     
@@ -40,7 +56,7 @@ class App extends Component {
               <div class="card__title">{Moment(resp.date).format('YYYY-MM-DD')}
               </div>
               {resp.responsibilities.map((r, index) => (
-                <div>
+                <div key={r.playerTaskId}>
                   <div class="card">
                     <div class="card__title">
                       Id:{r.playerTaskId} - {r.cardName} - {r.taskType}
@@ -48,13 +64,13 @@ class App extends Component {
                     <div class="card__subtitle">
                       <p>Task #:{r.playerTaskId} - {r.cardName} - {r.taskType}</p>
                       <p>Cadence: {r.cadenceName}</p>
-                      {this.onlyShowNonEmptyStr("When", r.when)}
+                      <p>{this.onlyShowNonEmptyStr("When", r.when)}</p>
                       <p>Requirement: {r.requirement}</p>
                       <p>{this.onlyShowNonEmptyStr("Minimum Standard", r.minimumStandard)}</p>
                       <p>{this.onlyShowNonEmptyStr("Notes", r.notes)}</p>
                     </div>
                     <div class="buttonsRightSide">
-                      <button id="btnComplete">Complete</button>
+                      <button id="btnComplete" onClick={this.completeResponsibility} type="button">Complete</button>
                     </div>
                   </div>
                   

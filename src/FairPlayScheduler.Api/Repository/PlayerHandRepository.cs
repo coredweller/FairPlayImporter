@@ -24,7 +24,7 @@ namespace FairPlayScheduler.Api.Repository
             var userResponsibilities = new List<Responsibility>();
             var sql = $@"
                     SELECT pt.Id as 'PlayerTaskId', uc.CardName, uc.Suit, pt.TaskType,
-                    pt.Requirement, pt.Cadence as 'CadenceId', pt.MinimumStandard, 
+                    pt.Requirement, pt.Cadence, pt.MinimumStandard, 
                     ts.CronSchedule, ts.Notes as 'When', pt.Notes
                     FROM PlayerTask pt 
                     JOIN [UserCard] uc ON uc.Id = pt.CardId
