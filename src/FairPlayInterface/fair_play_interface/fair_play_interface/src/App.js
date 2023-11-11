@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import './App.css';
+import Moment from 'moment';
 
 class App extends Component {
   constructor(props) {
@@ -28,31 +30,37 @@ class App extends Component {
     const { responsibilities } = this.state;
     
     return (
-      <div className="container">
-        <div className="jumbotron">
-          <h1 className="display-4">Responsibilities</h1>
+      <div class="container">
+        <div class="jumbotron">
+          <h1 class="display-4">Responsibilities</h1>
         </div>
         {responsibilities.map((resp, index) => {
           return (
-            <div className="card" key={resp.date}>
-              <div className="card-header">{resp.date}
+            <div key={resp.date}>
+              <div class="card__title">{Moment(resp.date).format('YYYY-MM-DD')}
               </div>
               {resp.responsibilities.map((r, index) => (
                 <div>
-                  <div className="card-header">
-                    #{index+1}
+                  <div class="card">
+                    <div class="card__title">
+                      Id:{r.playerTaskId} - {r.cardName} - {r.taskType}
+                    </div>
+                    <div class="card__subtitle">
+                      <p>Task #:{r.playerTaskId} - {r.cardName} - {r.taskType}</p>
+                      <p>Cadence: {r.cadenceName}</p>
+                      {this.onlyShowNonEmptyStr("When", r.when)}
+                      <p>Requirement: {r.requirement}</p>
+                      <p>{this.onlyShowNonEmptyStr("Minimum Standard", r.minimumStandard)}</p>
+                      <p>{this.onlyShowNonEmptyStr("Notes", r.notes)}</p>
+                    </div>
+                    <div class="buttonsRightSide">
+                      <button id="btnComplete">Complete</button>
+                    </div>
                   </div>
-                  <div className="card-body">
-                    <p className="card-text">Task #:{r.playerTaskId} - {r.cardName} - {r.taskType}</p>
-                    <p>Cadence: {r.cadenceName}</p>
-                    {this.onlyShowNonEmptyStr("When", r.when)}
-                    <p>Requirement: {r.requirement}</p>
-                    <p>{this.onlyShowNonEmptyStr("Minimum Standard", r.minimumStandard)}</p>
-                    <p>{this.onlyShowNonEmptyStr("Notes", r.notes)}</p>
-                  </div>
+                  
                 </div>
               ))}
-              </div>
+            </div>
           )
         })}
       </div>
