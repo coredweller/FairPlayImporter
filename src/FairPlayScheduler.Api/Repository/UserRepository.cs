@@ -1,15 +1,15 @@
 ﻿using Dapper;
-using FairPlayImporter.Model;
-using FairPlayScheduler.Model;
+using FairPlayScheduler.Api.Model;
+using FairPlayScheduler.Api.Configuration;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
-namespace FairPlayImporter.Repository
+namespace FairPlayScheduler.Api.Repository
 {
     public class UserRepository : IUserRepo
     {
         private string _connectionString;
-        public UserRepository(IDatabaseConfig configuration)  
+        public UserRepository(IDatabaseConfig configuration)
         {
             _connectionString = configuration.ConnectionString ?? throw new ArgumentException("NO CONFIGURATION FOR CONNECTION STRINGS!!");
         }

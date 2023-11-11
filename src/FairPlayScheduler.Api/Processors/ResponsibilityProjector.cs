@@ -1,6 +1,5 @@
-﻿using FairPlayImporter.Repository;
-using FairPlayScheduler.Model;
-using FairPlayScheduler.Repository;
+﻿using FairPlayScheduler.Api.Model;
+using FairPlayScheduler.Api.Repository;
 using NCrontab;
 
 namespace FairPlayScheduler.Processors
@@ -40,10 +39,10 @@ namespace FairPlayScheduler.Processors
             var list = GetInitializedList(startDate, howManyDays);
             var output = responsibilities.Select(r =>
             {
-                if (CadenceToSkip(r.CadenceId)) return r;
+                if (CadenceToSkip(r.Cadence)) return r;
 
                 //If its daily then always include it
-                if ((Cadence)r.CadenceId == Cadence.Daily)
+                if (r.Cadence == Cadence.Daily)
                 {
                     list.ForEach(l => l.Responsibilities.Add(r));
                     return r;
@@ -64,9 +63,8 @@ namespace FairPlayScheduler.Processors
             return list;
         }
 
-        private bool CadenceToSkip(int cadenceId)
+        private bool CadenceToSkip(Cadence cadence)
         {
-            var cadence = (Cadence)cadenceId;
             if (cadence == Cadence.AsNeeded || cadence == Cadence.Unknown || cadence == Cadence.Once) 
                 return true;
             return false;

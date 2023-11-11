@@ -1,9 +1,10 @@
 ﻿using Dapper;
-using FairPlayScheduler.Model;
+using FairPlayScheduler.Api.Configuration;
+using FairPlayScheduler.Api.Model;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
-namespace FairPlayScheduler.Repository
+namespace FairPlayScheduler.Api.Repository
 {
     public interface IPlayerHandRepo
     {

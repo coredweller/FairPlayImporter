@@ -18,12 +18,16 @@ namespace FairPlayScheduler
             .AddJsonFile("appsettings.json", false)
             .Build();
 
+            var connectionString = configuration.GetConnectionString("FairPlayDatabaseContext") ?? throw new ArgumentException("NO CONFIGURATION FOR CONNECTION STRINGS!!");
+            var dbConfig = new DatabaseConfig { ConnectionString = connectionString };
+
             var serviceProvider = new ServiceCollection()
             .AddLogging()
             .AddScoped<IUserRepo, UserRepository>()
             .AddScoped<IPlayerHandRepo, PlayerHandRepository>()
             .AddScoped<IProjectResponsibility, ResponsibilityProjector>()
             .AddSingleton(configuration)
+            .AddSingleton<IDatabaseConfig>(dbConfig)
             .BuildServiceProvider();
 
             Console.WriteLine("Player's Name:");
@@ -69,10 +73,10 @@ namespace FairPlayScheduler
             if(projector == null) { Console.WriteLine("Projector Missing!"); return; }
 
             //TODO: Take the start date in from user
-            var output = await projector.ProjectResponsibilities(playerName, DateTime.Now, days);
+            var output = await projector.ProjectResponsibilities(playerName, DateTime.Now.Date, days);
             output.Select(o =>
             {
-                Console.WriteLine($"Date: {o.Date}");
+                Console.WriteLine($"Date: {o.Date.Date}");
 
                 o.Responsibilities.Select(r => {
                     var cadence = (Cadence)r.CadenceId;
@@ -82,7 +86,6 @@ namespace FairPlayScheduler
                 return o;
             }).ToList();
 
-            //TODO: Test it to make sure every other Cadence works besides just Daily
             //TODO: Make a better display mechanism
             //TODO: Make a way to check it off and keep track of it in a Database
             //  so you know when you did it last and be able to take a note next to it 
