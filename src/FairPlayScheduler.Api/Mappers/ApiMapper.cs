@@ -8,11 +8,15 @@ namespace FairPlayScheduler.Api.Mappers
     {
         public ApiMapper() 
         {
-            CreateMap<Responsibility, ResponsibilityModel>()
+            CreateMap<Responsibility, ResponsibilityResponse>()
                 .ForMember(dest => dest.Cadence, act => act.MapFrom(src => Enum.GetName(typeof(Cadence), (int)src.Cadence)))
                 .ForMember(dest => dest.Schedule, act => act.MapFrom(src => src.CronSchedule));
 
-            CreateMap<ResponsibilityByDay, DailyResponsibilityModel>();
+            CreateMap<ResponsibilityByDay, DailyResponsibilityResponse>();
+
+            CreateMap<CompletedTaskRequest, CompletedTask>();
+
+            CreateMap<CompletedTask, CompletedTaskResponse>();
         }
     }
 }

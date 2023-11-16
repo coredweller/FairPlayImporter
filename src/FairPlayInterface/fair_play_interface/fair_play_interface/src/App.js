@@ -12,6 +12,7 @@ class App extends Component {
   }
 
   componentDidMount() {
+    //TODO: Get rid of hard coded URLS and add them to config
     const url = "https://localhost:7207/Responsibility";
     fetch(url)
     .then(response => response.json())
@@ -35,12 +36,18 @@ class App extends Component {
       //If success then change background color or put it in a complete bucket at the bottom
       //Then when the page loads check to see if it has already been completed 
 
-    const url = "https://localhost:7207/Responsibility";
+    //TODO: Get rid of hard coded URLS and add them to config
+    const url = "https://localhost:7207/CompletedTask";
     // fetch(url)
     // .then(response => response.json())
     // .then(json => this.setState({ completedResponsibilities: json }))
     // .then(res=> this.setState({quotes:[...this.state,res.data[0]]}))
+    
   }
+
+foo(bar){
+  console.log(bar)
+}
 
   render() {
     const { responsibilities } = this.state;
@@ -70,7 +77,8 @@ class App extends Component {
                       <p>{this.onlyShowNonEmptyStr("Notes", r.notes)}</p>
                     </div>
                     <div class="buttonsRightSide">
-                      <button id="btnComplete" onClick={this.completeResponsibility} type="button">Complete</button>
+                    {/* <button id="btnComplete" onClick={this.completeResponsibility} type="button">Complete</button> */}
+                    <button id="btnComplete" onClick={() => this.foo(r)} type="button">Complete</button>
                     </div>
                   </div>
                   

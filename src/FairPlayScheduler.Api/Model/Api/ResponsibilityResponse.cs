@@ -1,6 +1,6 @@
 ﻿namespace FairPlayScheduler.Api.Model.Api
 {
-    public class ResponsibilityModel
+    public class ResponsibilityResponse
     {
         public long PlayerTaskId { get; set; }
         public string? CardName { get; set; }

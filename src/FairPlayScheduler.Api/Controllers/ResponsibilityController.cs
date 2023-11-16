@@ -1,5 +1,4 @@
 using AutoMapper;
-using FairPlayScheduler.Api.Model;
 using FairPlayScheduler.Api.Model.Api;
 using FairPlayScheduler.Processors;
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +22,12 @@ namespace FairPlayScheduler.Api.Controllers
         }
 
         [HttpGet(Name = "GetResponsibilitiesForToday")]
-        public async Task<IEnumerable<DailyResponsibilityModel>> Get()
+        public async Task<IEnumerable<DailyResponsibilityResponse>> Get()
         {
             var playerName = "Dan"; //TODO: Hardcode for testing for now
             var days = 1; //TODO: Hardcode for testing for now
             var list = await _projector.ProjectResponsibilities(playerName, DateTime.Now.Date, days);
-            var output = _mapper.Map<IEnumerable<DailyResponsibilityModel>>(list);
+            var output = _mapper.Map<IEnumerable<DailyResponsibilityResponse>>(list);
             return output;
         }
     }

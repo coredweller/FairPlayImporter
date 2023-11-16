@@ -1,10 +1,8 @@
 
 using FairPlayScheduler.Api.Configuration;
 using FairPlayScheduler.Api.Repository;
+using FairPlayScheduler.Api.Service;
 using FairPlayScheduler.Processors;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
-using System.Security.Cryptography.X509Certificates;
 
 namespace FairPlayScheduler.Api
 {
@@ -39,6 +37,7 @@ namespace FairPlayScheduler.Api
                 .AddScoped<IPlayerHandRepo, PlayerHandRepository>()
                 .AddScoped<ICompletedTaskRepository, CompletedTaskRepository>()
                 .AddScoped<IProjectResponsibility, ResponsibilityProjector>()
+                .AddScoped<ICompletedTaskService, CompletedTaskService>()
                 .AddSingleton(configuration)
                 .AddSingleton<IDatabaseConfig>(dbConfig);
 
@@ -48,7 +47,7 @@ namespace FairPlayScheduler.Api
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.WithOrigins("http://localhost:3000");
+                                      policy.WithOrigins("http://localhost:3000", "http://localhost:4200");
                                   });
             });
 
