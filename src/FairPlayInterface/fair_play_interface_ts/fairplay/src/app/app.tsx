@@ -1,8 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 import Moment from 'moment';
-
-import NxWelcome from './nx-welcome';
 import { useState, useEffect } from 'react';
 
 interface DailyResponsiblities {
@@ -57,15 +55,15 @@ export function App() {
         {responsibilities.map((resp, index) => {
           return (
             <div key={index}>
-              <div className="card__title">{Moment(resp.date).format('YYYY-MM-DD')}
+              <div className={styles.card__title}>{Moment(resp.date).format('YYYY-MM-DD')}
               </div>
               {resp.responsibilities.map((r, index) => (
                 <div key={r.playerTaskId}>
-                  <div className="card">
-                    <div className="card__title">
+                  <div className={styles.card}>
+                    <div className={styles.card__title}>
                       Id:{r.playerTaskId.toString()} - {r.cardName} - {r.taskType}
                     </div>
-                    <div className="card__subtitle">
+                    <div className={styles.card__subtitle}>
                       <p>Task #:{r.playerTaskId.toString()} - {r.cardName} - {r.taskType}</p>
                       <p>Cadence: {r.cadence}</p>
                       <div>{onlyShowNonEmptyStr("When", r.when)}</div>
@@ -73,7 +71,7 @@ export function App() {
                       <div>{onlyShowNonEmptyStr("Minimum Standard", r.minimumStandard)}</div>
                       <div>{onlyShowNonEmptyStr("Notes", r.notes)}</div>
                     </div>
-                    <div className="buttonsRightSide">
+                    <div className={styles.buttonsRightSide}>
                     {/* <button id="btnComplete" onClick={this.completeResponsibility} type="button">Complete</button> */}
                     <button id="btnComplete" onClick={() => completeResponsibility(r)} type="button">Complete</button>
                     </div>
