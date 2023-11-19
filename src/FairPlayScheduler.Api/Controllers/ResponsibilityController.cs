@@ -21,11 +21,11 @@ namespace FairPlayScheduler.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet(Name = "GetResponsibilitiesForToday")]
-        public async Task<IEnumerable<DailyResponsibilityResponse>> Get()
+        [HttpGet("{playerName}/{days}", Name = "GetResponsibilitiesForToday")]
+        public async Task<IEnumerable<DailyResponsibilityResponse>> Get(string playerName, int days)
         {
-            var playerName = "Dan"; //TODO: Hardcode for testing for now
-            var days = 1; //TODO: Hardcode for testing for now
+            //var playerName = "Dan"; //TODO: Hardcode for testing for now
+            //var days = 1; //TODO: Hardcode for testing for now
             var list = await _projector.ProjectResponsibilities(playerName, DateTime.Now.Date, days);
             var output = _mapper.Map<IEnumerable<DailyResponsibilityResponse>>(list);
             return output;

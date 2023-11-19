@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 import Moment from 'moment';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
+import PlayerChooser from './player_chooser';
 
 interface DailyResponsiblities {
   date: Date,
@@ -21,6 +22,13 @@ interface Responsibility {
   notes?: string;
 }
 
+interface CompleteResponsibilityRequest {
+  playerTaskId: bigint;
+  assignedDate: Date;
+  completedDate: Date;
+  notes: string;
+}
+
 function onlyShowNonEmptyStr(label: string, valueStr?: string) {
   if(valueStr) {
     return <div>{label}: {valueStr} </div>
@@ -30,28 +38,76 @@ function onlyShowNonEmptyStr(label: string, valueStr?: string) {
   }
 }
 
-function completeResponsibility(bar: Responsibility)
-{
-  console.log(bar);
-}
-
 export function App() {
-  const [age, setAge] = useState<number>(23)
   const [ responsibilities, setResponsibilities ] = useState<DailyResponsiblities[]>([]);
+  const [ playerName, setPlayerName ] = useState<string>("")
+  const [ days, setDays ] = useState<number>(1)
 
-  useEffect(() => {
-    //TODO: Get rid of hard coded URLS and add them to config
-    const url = "https://localhost:7207/Responsibility";
+  function playerNameChanged(props: ChangeEvent<HTMLInputElement>) {
+    if(props.target.value.length < 3) return;
+
+    console.log("SETTING PLAYERNAME FOUND!");
+    setPlayerName(props.target.value);
+
+    loadResponsibilities(props.target.value, days);
+  }
+
+  function daysChanged(props: ChangeEvent<HTMLInputElement>) {
+    let latestDays = 1;
+    try {
+      let d = parseInt(props.target.value);
+      if(d && d < 0){
+        latestDays = d;
+      }
+    } catch (error) {
+      console.log("error in daysChanged: " + error);
+      latestDays = 1;
+    }
+
+    if(latestDays <= 0) return;
+
+    console.log("SETTING DAYS DAYS DAYS DAYSSS!");
+    setDays(latestDays);
+
+    loadResponsibilities(playerName, latestDays);
+  }
+
+  function completeResponsibility(resp: Responsibility)
+  {
+      console.log(resp);
+      const request: CompleteResponsibilityRequest = {
+        playerTaskId: resp.playerTaskId,
+        assignedDate: new Date(), //TODO: actually put the date the task is from here
+        completedDate: new Date(),
+        notes: '' //TODO: allow the user to add notes
+      }
+      const url = "https://localhost:7207/CompletedTask";
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request) //TODO: this object is not what the API is expecting
+      };
+      
+      fetch(url, requestOptions)
+          .then(response => response.json())
+
+      //TODO: make it so it doesn't bring back those that are already completed
+      loadResponsibilities(playerName, days);
+  }
+
+  function loadResponsibilities(playerName: string, days: number){
+    const url = "https://localhost:7207/Responsibility/" + playerName + "/" + days;
     fetch(url)
     .then(response => response.json())
-    .then(json => setResponsibilities(json))
-  })
+    .then(json => setResponsibilities(json));
+  }
 
   return (
     <div className="container">
         <div className="jumbotron">
           <h1 className="display-4">Responsibilities</h1>
         </div>
+        <PlayerChooser playerName={playerName} playerNameChanged={playerNameChanged} days={days} daysChanged={daysChanged}></PlayerChooser>
         {responsibilities.map((resp, index) => {
           return (
             <div key={index}>
@@ -82,7 +138,8 @@ export function App() {
             </div>
           )
         })}
-      </div>
+        
+    </div>
   );
 }
 
