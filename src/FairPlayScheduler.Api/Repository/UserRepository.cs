@@ -27,5 +27,23 @@ namespace FairPlayScheduler.Api.Repository
 
             return users;
         }
+
+        public async Task<User> GetUserByPlayerTaskId(long playerTaskId)
+        {
+            var user = new User();
+            var sql = @"SELECT u.* 
+                        FROM PlayerTask pt 
+                        JOIN UserCard uc ON pt.CardId = uc.Id 
+                        JOIN [User] u ON uc.UserId = u.Id 
+                        WHERE pt.Id = " + playerTaskId;
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var maybeUser = await connection.QuerySingleAsync<User>(sql);
+                if(maybeUser == null) { throw new ArgumentException($"PlayerTaskId: {playerTaskId} is not connected to a valid user!"); }
+                user = maybeUser;
+            }
+            return user;
+        }
     }
 }

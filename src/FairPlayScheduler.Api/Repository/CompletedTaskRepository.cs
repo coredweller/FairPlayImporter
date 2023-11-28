@@ -28,5 +28,28 @@ namespace FairPlayScheduler.Api.Repository
 
             return task;
         }
+
+        public async Task<IList<CompletedTask>> GetCompletedTasksAsync(long userId, int days)
+        {
+            var tasks = new List<CompletedTask>();
+            var sql = $@"
+                    SELECT pt.Id as 'PlayerTaskId', uc.CardName, uc.Suit, pt.TaskType,
+                    pt.Requirement, pt.Cadence, pt.MinimumStandard, 
+                    ts.CronSchedule, ts.Notes as 'When', pt.Notes
+                    FROM CompletedTask ct
+                    JOIN PlayerTask pt ON ct.PlayerTaskId = pt.Id
+                    JOIN [UserCard] uc ON uc.Id = pt.CardId
+                    LEFT JOIN TaskSchedule ts ON pt.Id = ts.PlayerTaskId
+                    WHERE uc.UserId = {userId} AND ct.CompletedDate >= dateadd(day,-{days},ct.CompletedDate)
+                    ORDER BY pt.Id ASC;";
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var completedTasks = await connection.QueryAsync<CompletedTask>(sql);
+                tasks = completedTasks.ToList();
+            }
+
+            return tasks;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FairPlayScheduler.Api.Model;
 using FairPlayScheduler.Api.Repository;
+using FairPlayScheduler.Api.Service;
 using NCrontab;
 
 namespace FairPlayScheduler.Processors
@@ -11,29 +12,28 @@ namespace FairPlayScheduler.Processors
 
     public class ResponsibilityProjector : IProjectResponsibility
     {
-        private readonly IUserRepo _userRepo;
+        private readonly IUserService _userService;
         private readonly IPlayerHandRepo _playerHandRepo;
 
-        public ResponsibilityProjector(IUserRepo userRepo, IPlayerHandRepo playerHandRepo)
+        public ResponsibilityProjector(IUserService userService, IPlayerHandRepo playerHandRepo)
         {
-            _userRepo = userRepo;
+            _userService = userService;
             _playerHandRepo = playerHandRepo;
         }
 
         public async Task<IList<ResponsibilityByDay>> ProjectResponsibilities(string userName, DateTime startDate, int howManyDays = 1)
         {
-            var usersByName = await _userRepo.GetUsersByName(userName);
-            var users = usersByName.OrderByDescending(u => u.UpdatedDate.HasValue ? u.UpdatedDate : u.CreatedDate);
-            if (!users.Any()) throw new ArgumentException($"No user with the name of {userName} found in the system");
+            var currentUser = await _userService.GetUserByName(userName);
+            if(currentUser == null) return new List<ResponsibilityByDay>();
 
-            var currentUser = users.First();
             var responsibilities = await _playerHandRepo.GetResponsibilitiesAsync(currentUser.Id);
-            if (!responsibilities.Any()) throw new ArgumentException($"No responsibilities found for user name: {userName}");
+            if (!responsibilities.Any()) return new List<ResponsibilityByDay>();
 
             var output = ProcessResponsibilities(responsibilities, startDate, howManyDays);
             return output;
         }
 
+        //TODO: only mark a responsibility as complete if the completed date matches the projected day
         private IList<ResponsibilityByDay> ProcessResponsibilities(IList<Responsibility> responsibilities, DateTime startDate, int howManyDays)
         {
             var list = GetInitializedList(startDate, howManyDays);
@@ -44,7 +44,10 @@ namespace FairPlayScheduler.Processors
                 //If its daily then always include it
                 if (r.Cadence == Cadence.Daily)
                 {
-                    list.ForEach(l => l.Responsibilities.Add(r));
+                    list.ForEach(l => {
+                        if (r.CompletedDate.HasValue && l.Date.Date == r.CompletedDate.Value.Date) r.MarkAsComplete = true;
+                        l.Responsibilities.Add(r);
+                    });
                     return r;
                 }
 
@@ -54,8 +57,11 @@ namespace FairPlayScheduler.Processors
                     var schedule = CrontabSchedule.Parse(r.CronSchedule);
                     var currentDate = startDate.AddDays(i-1);
                     var nextOccurrence = schedule.GetNextOccurrence(currentDate);
-                    if (nextOccurrence == currentDate.AddDays(1)) 
+                    if (nextOccurrence == currentDate.AddDays(1))
+                    {
+                        if (r.CompletedDate.HasValue && list[i].Date.Date == r.CompletedDate.Value.Date) r.MarkAsComplete = true;
                         list[i].Responsibilities.Add(r);
+                    }
                 }
 
                 return r;
@@ -76,7 +82,7 @@ namespace FairPlayScheduler.Processors
 
             for (int i = 0; i < howManyDays; i++)
             {
-                list.Add(new ResponsibilityByDay(startDate.AddDays(i)));
+                list.Add(new ResponsibilityByDay { Date = startDate.AddDays(i) });
             }
             return list;
         }

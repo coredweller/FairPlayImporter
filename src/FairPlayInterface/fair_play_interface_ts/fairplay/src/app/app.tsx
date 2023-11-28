@@ -3,24 +3,7 @@ import styles from './app.module.scss';
 import Moment from 'moment';
 import { useState, useEffect, ChangeEvent } from 'react';
 import PlayerChooser from './player_chooser';
-
-interface DailyResponsiblities {
-  date: Date,
-  responsibilities: Responsibility[]
-}
-
-interface Responsibility {
-  playerTaskId: bigint;
-  cardName: string;
-  suit: string;
-  taskType: string;
-  requirement: string;
-  cadence: string;
-  minimumStandard?: string;
-  schedule?: string;
-  when?: string;
-  notes?: string;
-}
+import DailyDigestLink from './daily_digest_link';
 
 interface CompleteResponsibilityRequest {
   playerTaskId: bigint;
@@ -46,9 +29,7 @@ export function App() {
   function playerNameChanged(props: ChangeEvent<HTMLInputElement>) {
     if(props.target.value.length < 3) return;
 
-    console.log("SETTING PLAYERNAME FOUND!");
     setPlayerName(props.target.value);
-
     loadResponsibilities(props.target.value, days);
   }
 
@@ -56,7 +37,7 @@ export function App() {
     let latestDays = 1;
     try {
       let d = parseInt(props.target.value);
-      if(d && d < 0){
+      if(d && d > 0){
         latestDays = d;
       }
     } catch (error) {
@@ -65,33 +46,30 @@ export function App() {
     }
 
     if(latestDays <= 0) return;
-
-    console.log("SETTING DAYS DAYS DAYS DAYSSS!");
     setDays(latestDays);
-
     loadResponsibilities(playerName, latestDays);
   }
 
-  function completeResponsibility(resp: Responsibility)
+  function completeResponsibility(daily: DailyResponsiblities, resp: Responsibility)
   {
       console.log(resp);
       const request: CompleteResponsibilityRequest = {
         playerTaskId: resp.playerTaskId,
-        assignedDate: new Date(), //TODO: actually put the date the task is from here
+        assignedDate: daily.date,
         completedDate: new Date(),
-        notes: '' //TODO: allow the user to add notes
+        notes: 'test notes' //TODO: allow the user to add notes
       }
       const url = "https://localhost:7207/CompletedTask";
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request) //TODO: this object is not what the API is expecting
+        body: JSON.stringify(request)
       };
       
       fetch(url, requestOptions)
           .then(response => response.json())
 
-      //TODO: make it so it doesn't bring back those that are already completed
+      //TODO: make it so it marks those already completed with different background color
       loadResponsibilities(playerName, days);
   }
 
@@ -110,17 +88,19 @@ export function App() {
         <PlayerChooser playerName={playerName} playerNameChanged={playerNameChanged} days={days} daysChanged={daysChanged}></PlayerChooser>
         {responsibilities.map((resp, index) => {
           return (
-            <div key={index}>
+            <div key={resp.date.toString()}>
               <div className={styles.card__title}>{Moment(resp.date).format('YYYY-MM-DD')}
               </div>
+              <div>
+                <DailyDigestLink playerName={playerName} responsibilities={resp}></DailyDigestLink>
+              </div>
               {resp.responsibilities.map((r, index) => (
-                <div key={r.playerTaskId}>
+                <div key={r.playerTaskId + "-" + index}>
                   <div className={styles.card}>
                     <div className={styles.card__title}>
                       Id:{r.playerTaskId.toString()} - {r.cardName} - {r.taskType}
                     </div>
                     <div className={styles.card__subtitle}>
-                      <p>Task #:{r.playerTaskId.toString()} - {r.cardName} - {r.taskType}</p>
                       <p>Cadence: {r.cadence}</p>
                       <div>{onlyShowNonEmptyStr("When", r.when)}</div>
                       <p>Requirement: {r.requirement}</p>
@@ -129,7 +109,7 @@ export function App() {
                     </div>
                     <div className={styles.buttonsRightSide}>
                     {/* <button id="btnComplete" onClick={this.completeResponsibility} type="button">Complete</button> */}
-                    <button id="btnComplete" onClick={() => completeResponsibility(r)} type="button">Complete</button>
+                    <button id="btnComplete" onClick={() => completeResponsibility(resp, r)} type="button">Complete</button>
                     </div>
                   </div>
                   

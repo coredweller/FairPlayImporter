@@ -12,5 +12,8 @@
         public string? CronSchedule { get; set; }
         public string? When { get; set; }
         public string? Notes { get; set; }
+        public long? CompletedTaskId { get; set; }
+        public DateTime? CompletedDate { get; set; }
+        public bool MarkAsComplete { get; set; }
     }
 }

@@ -1,0 +1,28 @@
+<div>
+
+    {{Date}}:
+    <br />
+    <div>
+        {{#Responsibilities}}
+            Id: {{PlayerTaskId}} - {{CardName}} - {{TaskType}}
+            <br />
+            Cadence: {{CadenceName}}
+            <br />
+            Requirement: {{Requirement}}
+            {{#HasWhen}}
+                <br />
+                When: {{When}}
+            {{/HasWhen}}
+            {{#HasMinimumStandard}}
+                <br />
+                Minimum Standard: {{MinimumStandard}}
+            {{/HasMinimumStandard}}
+            {{#HasNotes}}
+                <br />
+                Notes: {{Notes}}
+            {{/HasNotes}}
+            <br />
+            <br />
+        {{/Responsibilities}}
+    </div>
+</div>

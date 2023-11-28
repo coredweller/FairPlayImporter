@@ -13,41 +13,49 @@ namespace FairPlayScheduler.Api
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddAutoMapper(typeof(Program));
 
-            // Add services to the container.
-
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add<HttpResponseExceptionFilter>();
             });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            //Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            //Configuration
             IConfiguration configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", false)
             .Build();
 
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
             var connectionString = configuration.GetConnectionString("FairPlayDatabaseContext") ?? throw new ArgumentException("NO CONFIGURATION FOR CONNECTION STRINGS!!");
             var dbConfig = new DatabaseConfig { ConnectionString = connectionString };
 
+            //DI
             builder.Services
                 .AddScoped<IUserRepo, UserRepository>()
                 .AddScoped<IPlayerHandRepo, PlayerHandRepository>()
                 .AddScoped<ICompletedTaskRepository, CompletedTaskRepository>()
                 .AddScoped<IProjectResponsibility, ResponsibilityProjector>()
                 .AddScoped<ICompletedTaskService, CompletedTaskService>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<INotificationService, NotificationService>()
+                .AddScoped<ITemplateService, TemplateService>()
                 .AddSingleton(configuration)
-                .AddSingleton<IDatabaseConfig>(dbConfig);
+                .AddSingleton<IDatabaseConfig>(dbConfig)
+                .AddTransient<IMailService, MailService>();
 
+            //Cors
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.WithOrigins("http://localhost:3000", "http://localhost:4200");
+                                      policy.WithOrigins("http://localhost:3000", "http://localhost:4200")
+                                            .AllowAnyMethod().AllowAnyHeader();
                                   });
             });
 

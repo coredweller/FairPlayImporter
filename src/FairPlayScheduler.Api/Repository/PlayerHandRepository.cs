@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using FairPlayScheduler.Api.Configuration;
 using FairPlayScheduler.Api.Model;
-using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
 namespace FairPlayScheduler.Api.Repository
@@ -25,10 +24,11 @@ namespace FairPlayScheduler.Api.Repository
             var sql = $@"
                     SELECT pt.Id as 'PlayerTaskId', uc.CardName, uc.Suit, pt.TaskType,
                     pt.Requirement, pt.Cadence, pt.MinimumStandard, 
-                    ts.CronSchedule, ts.Notes as 'When', pt.Notes
+                    ts.CronSchedule, ts.Notes as 'When', pt.Notes, ct.Id as 'CompletedTaskId', ct.CompletedDate
                     FROM PlayerTask pt 
                     JOIN [UserCard] uc ON uc.Id = pt.CardId
                     LEFT JOIN TaskSchedule ts ON pt.Id = ts.PlayerTaskId
+                    LEFT JOIN CompletedTask ct ON ct.PlayerTaskId = pt.Id
                     WHERE uc.UserId = {userId}
                     ORDER BY pt.Id ASC;";
             using (SqlConnection connection = new SqlConnection(_connectionString))

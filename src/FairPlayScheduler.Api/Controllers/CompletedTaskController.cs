@@ -27,5 +27,13 @@ namespace FairPlayScheduler.Api.Controllers
             var response = _mapper.Map<CompletedTaskResponse>(savedTask);
             return response;
         }
+
+        [HttpGet("/{playerName}/{days}", Name = "GetAllCompletedTasksForUser")]
+        public async Task<IList<CompletedTaskResponse>> GetCompletedTasksForUser(string playerName, int days)
+        {
+            var tasks = await _taskService.GetCompletedTasksByUser(playerName, days);
+            var response = _mapper.Map<IList<CompletedTaskResponse>>(tasks);
+            return response;
+        }
     }
 }

@@ -12,5 +12,6 @@
         public string? Schedule { get; set; }
         public string? When { get; set; }
         public string? Notes { get; set; }
+        public bool IsCompleted { get; set; } 
     }
 }
